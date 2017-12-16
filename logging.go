@@ -3,39 +3,55 @@ package main
 import (
 	"time"
 
+	"github.com/aquiladev/lvl/storage"
 	"github.com/go-kit/kit/log"
 )
 
 type loggingMiddleware struct {
 	logger log.Logger
-	next   QueueService
+	next   StorageService
 }
 
-func (mw loggingMiddleware) Put(s string) (output string, err error) {
+func (mw loggingMiddleware) Put(k, v []byte) (err error) {
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "put",
-			"input", s,
-			"output", output,
+			"key", k,
+			"value", v,
 			"err", err,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
 
-	output, err = mw.next.Put(s)
+	err = mw.next.Put(k, v)
 	return
 }
 
-func (mw loggingMiddleware) Pop(s string) (n string) {
+func (mw loggingMiddleware) PutBatch(pairs []storage.KeyValue) (err error) {
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
-			"method", "pop",
-			"input", s,
-			"n", n,
+			"method", "put_batch",
+			"pairs_count", len(pairs),
+			"err", err,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
 
-	n = mw.next.Pop(s)
+	err = mw.next.PutBatch(pairs)
+	return
+}
+
+func (mw loggingMiddleware) Get(k []byte) (v []byte, err error) {
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "get",
+			"key", k,
+			"value", v,
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	v, err = mw.next.Get(k)
 	return
 }

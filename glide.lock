@@ -1,5 +1,5 @@
-hash: ab71b83da0015c6e89d345efdc084a026c0be58b2ca271628461074ce3cc3bad
-updated: 2017-12-06T11:21:48.2462651+01:00
+hash: 407f52e7f91a618b51b6167dc98bfd697ed3878d1b79af23b182e6fac7ab45bb
+updated: 2017-12-15T23:06:04.0033161+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -47,4 +47,22 @@ imports:
   version: a6e9df898b1336106c743392c48ee0b71f5c4efa
   subpackages:
   - xfs
-testImports: []
+- name: github.com/syndtr/goleveldb
+  version: 34011bf325bce385408353a30b101fe5e923eb6e
+  subpackages:
+  - leveldb
+- name: github.com/tecbot/gorocksdb
+  version: 15d5431583170b15f738a3e67ade13749f458058
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert

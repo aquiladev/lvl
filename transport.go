@@ -6,24 +6,53 @@ import (
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/aquiladev/lvl/storage"
 )
 
-func makePutEndpoint(svc QueueService) endpoint.Endpoint {
+type KeyValue struct {
+	K string
+	V string
+}
+
+func makePutEndpoint(svc StorageService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(putRequest)
-		v, err := svc.Put(req.S)
+		err := svc.Put([]byte(req.K), []byte(req.V))
 		if err != nil {
-			return putResponse{v, err.Error()}, nil
+			return putResponse{err.Error()}, nil
 		}
-		return putResponse{v, ""}, nil
+		return putResponse{""}, nil
 	}
 }
 
-func makePopEndpoint(svc QueueService) endpoint.Endpoint {
+func makePutBatchEndpoint(svc StorageService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(popRequest)
-		v := svc.Pop(req.S)
-		return popResponse{v}, nil
+		req := request.(putBatchRequest)
+
+		pairs := make([]storage.KeyValue, len(req.P))
+		for i, j := range req.P {
+			pairs[i] = storage.KeyValue{
+				V: []byte(j.V),
+				K: []byte(j.K),
+			}
+		}
+
+		err := svc.PutBatch(pairs)
+		if err != nil {
+			return putBatchResponse{err.Error()}, nil
+		}
+		return putBatchResponse{""}, nil
+	}
+}
+
+func makeGetEndpoint(svc StorageService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(getRequest)
+		v, err := svc.Get([]byte(req.K))
+		if err != nil {
+			return getResponse{"", err.Error()}, nil
+		}
+		return getResponse{string(v), ""}, nil
 	}
 }
 
@@ -35,8 +64,16 @@ func decodePutRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	return request, nil
 }
 
-func decodePopRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request popRequest
+func decodePutBatchRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var request putBatchRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		return nil, err
+	}
+	return request, nil
+}
+
+func decodeGetRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var request getRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -48,18 +85,27 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 }
 
 type putRequest struct {
-	S string `json:"s"`
+	K string `json:"k"`
+	V string `json:"v"`
 }
 
 type putResponse struct {
-	V   string `json:"v"`
 	Err string `json:"err,omitempty"` // errors don't JSON-marshal, so we use a string
 }
 
-type popRequest struct {
-	S string `json:"s"`
+type putBatchRequest struct {
+	P []KeyValue `json:"p"`
 }
 
-type popResponse struct {
-	V string `json:"v"`
+type putBatchResponse struct {
+	Err string `json:"err,omitempty"` // errors don't JSON-marshal, so we use a string
+}
+
+type getRequest struct {
+	K string `json:"k"`
+}
+
+type getResponse struct {
+	V   string `json:"v"`
+	Err string `json:"err,omitempty"` // errors don't JSON-marshal, so we use a string
 }
