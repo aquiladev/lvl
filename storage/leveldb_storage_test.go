@@ -26,8 +26,8 @@ func TestPutBatchGet(t *testing.T) {
 
 	storage := NewLevelDbStorage(db)
 	list := make([]KeyValue, 2)
-	list[0] = KeyValue{k: []byte("testK1"), v: []byte("testV1")}
-	list[1] = KeyValue{k: []byte("testK2"), v: []byte("testV2")}
+	list[0] = KeyValue{K: []byte("testK1"), V: []byte("testV1")}
+	list[1] = KeyValue{K: []byte("testK2"), V: []byte("testV2")}
 
 	err = storage.PutBatch(list)
 	assert.Equal(t, nil, err)

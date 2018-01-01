@@ -16,6 +16,8 @@ import (
 )
 
 func main() {
+	cfg, err := loadConfig()
+
 	logger := log.NewLogfmtLogger(os.Stderr)
 
 	fieldKeys := []string{"method", "error"}
@@ -32,7 +34,7 @@ func main() {
 		Help:      "Total duration of requests in microseconds.",
 	}, fieldKeys)
 
-	db, err := leveldb.OpenFile("d:/lvl/data", nil)
+	db, err := leveldb.OpenFile(cfg.DataDir, nil)
 	if err != nil {
 		panic(err)
 	}
