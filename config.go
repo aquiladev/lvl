@@ -26,7 +26,6 @@ type config struct {
 
 func loadConfig() (*config, error) {
 	cfg := config{
-		ShowVersion: true,
 		DataDir:     defaultDataDir,
 	}
 
@@ -47,6 +46,7 @@ func loadConfig() (*config, error) {
 
 	if cfg.ShowVersion {
 		fmt.Println(appName, "version", version())
+		os.Exit(0)
 	}
 
 	return &cfg, nil

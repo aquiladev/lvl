@@ -67,6 +67,10 @@ func main() {
 	http.Handle("/get", getHandler)
 
 	http.Handle("/metrics", promhttp.Handler())
+
+	logger.Log("Data directory: %s", cfg.DataDir)
+	logger.Log("Version %s", version())
+
 	logger.Log("msg", "HTTP", "addr", ":8080")
 	logger.Log("err", http.ListenAndServe(":8080", nil))
 }
