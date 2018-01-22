@@ -20,13 +20,14 @@ var (
 )
 
 type config struct {
-	ShowVersion bool   `short:"V" long:"version" description:"Display version information and exit"`
-	DataDir     string `short:"b" long:"datadir" description:"Directory to store data"`
+	ShowVersion  bool    `short:"V" long:"version" description:"Display version information and exit."`
+	DataDir      string  `short:"d" long:"datadir" description:"Directory to store data."`
+	MaxDiskUsage float64 `short:"m" long:"maxdiskusage" description:"Max disk usage in percentage." default:"95.0"`
 }
 
 func loadConfig() (*config, error) {
 	cfg := config{
-		DataDir:     defaultDataDir,
+		DataDir: defaultDataDir,
 	}
 
 	// Show the version and exit if the version flag was specified.

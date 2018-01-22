@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -17,6 +18,10 @@ import (
 
 func main() {
 	cfg, err := loadConfig()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Config: %+v\n", cfg)
 
 	logger := log.NewLogfmtLogger(os.Stderr)
 
@@ -40,7 +45,7 @@ func main() {
 	}
 
 	var svc StorageService
-	svc = newStorageService(storage.NewLevelDbStorage(db))
+	svc = newStorageService(storage.NewLevelDbStorage(db), cfg.DataDir, cfg.MaxDiskUsage)
 	svc = loggingMiddleware{logger, svc}
 	svc = instrumentingMiddleware{requestCount, requestLatency, svc}
 
